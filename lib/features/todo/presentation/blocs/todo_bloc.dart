@@ -38,19 +38,54 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   }
 
   Future<void> _onAddTodo(AddTodoEvent event, Emitter<TodoState> emit) async {
-    await addTodos(event.todo);
-    add(const LoadTodos());
+    if (state is! TodoLoaded) return;
+
+    final currentState = state as TodoLoaded;
+
+    final updatedTodos = [event.todo, ...currentState.todos];
+
+    emit(TodoLoaded(updatedTodos));
+
+    final result = await addTodos(event.todo);
+    result.fold((f) => emit(TodoError(f.message)), (_) {});
   }
 
   Future<void> _onUpdateTodo(
       UpdateTodoEvent event, Emitter<TodoState> emit) async {
-    await updateTodos(event.todo);
-    add(const LoadTodos());
+    if (state is! TodoLoaded) return;
+
+    final currentState = state as TodoLoaded;
+
+    final updatedTodos = currentState.todos.map((todo) {
+      return todo.id == event.todo.id ? event.todo : todo;
+    }).toList();
+
+    emit(TodoLoaded(updatedTodos));
+
+    final result = await updateTodos(event.todo);
+
+    result.fold(
+          (f) => emit(TodoError(f.message)),
+          (_) {},
+    );
   }
 
   Future<void> _onDeleteTodo(
       DeleteTodoEvent event, Emitter<TodoState> emit) async {
-    await deleteTodos(event.id);
-    add(const LoadTodos());
+    if (state is! TodoLoaded) return;
+
+    final currentState = state as TodoLoaded;
+
+    final updatedTodos =
+    currentState.todos.where((t) => t.id != event.id).toList();
+
+    emit(TodoLoaded(updatedTodos));
+
+    final result = await deleteTodos(event.id);
+
+    result.fold(
+          (f) => emit(TodoError(f.message)),
+          (_) {},
+    );
   }
 }

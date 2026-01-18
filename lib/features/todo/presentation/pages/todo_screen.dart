@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:proj/features/todo/presentation/widgets/add_todo_dialog.dart';
+import 'package:proj/features/todo/presentation/widgets/update_todo_dialog.dart';
+
 import '../../domain/entities/todo.dart';
 import '../blocs/todo_bloc.dart';
 import '../blocs/todo_event.dart';
@@ -14,14 +17,10 @@ class TodoScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Todos')),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final todo = Todo(
-            userId: 1,
-            id: DateTime.now().millisecondsSinceEpoch,
-            title: 'New Todo Raj',
-            completed: false,
+          showDialog(
+            context: context,
+            builder: (_) => AddTodoDialog(),
           );
-          context.read<TodoBloc>().add(AddTodoEvent(todo));
-
         },
         child: const Icon(Icons.add),
       ),
@@ -32,27 +31,52 @@ class TodoScreen extends StatelessWidget {
           }
 
           if (state is TodoLoaded) {
+            if (state.todos.isEmpty) {
+              return const Center(child: Text('No todos yet'));
+            }
+
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<TodoBloc>().add(const LoadTodos());
               },
               child: ListView.builder(
                 itemCount: state.todos.length,
-                itemBuilder: (_, i) {
-                  final todo = state.todos[i];
-                  return ListTile(
-                    title: Text(todo.title),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        context
-                            .read<TodoBloc>()
-                            .add(DeleteTodoEvent(todo.id));
-                      },
-                    ),
+                itemBuilder: (context, index) {
+                  final todo = state.todos[index];
+
+                  return Column(
+                    key: ValueKey(todo.id),
+                    children: [
+                      ListTile(
+                        title: Text(todo.title),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => UpdateTodoDialog(todo: todo),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                context.read<TodoBloc>().add(DeleteTodoEvent(todo.id));
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      if (index != state.todos.length - 1)
+                        const Divider(height: 1),
+                    ],
                   );
                 },
-              ),
+              )
             );
           }
 
@@ -60,7 +84,7 @@ class TodoScreen extends StatelessWidget {
             return Center(child: Text(state.message));
           }
 
-          return const SizedBox();
+          return const SizedBox.shrink();
         },
       ),
     );
