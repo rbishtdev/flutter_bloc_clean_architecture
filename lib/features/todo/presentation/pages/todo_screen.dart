@@ -14,7 +14,13 @@ class TodoScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Todos')),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-
+          final todo = Todo(
+            userId: 1,
+            id: DateTime.now().millisecondsSinceEpoch,
+            title: 'New Todo Raj',
+            completed: false,
+          );
+          context.read<TodoBloc>().add(AddTodoEvent(todo));
 
         },
         child: const Icon(Icons.add),
@@ -39,7 +45,9 @@ class TodoScreen extends StatelessWidget {
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () {
-
+                        // context
+                        //     .read<TodoBloc>()
+                        //     .add(DeleteTodoEvent(todo.id));
                       },
                     ),
                   );

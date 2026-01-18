@@ -7,6 +7,7 @@ import '../../domain/entities/todo.dart';
 import '../../domain/repositories/todo_repository.dart';
 import '../datasources/local/todo_local_data_source.dart';
 import '../datasources/remote/todo_remote_datasource.dart';
+import '../models/todo_model.dart';
 
 @LazySingleton(as: TodoRepository)
 class TodoRepositoryImpl implements TodoRepository {
@@ -36,4 +37,23 @@ class TodoRepositoryImpl implements TodoRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, void>> addTodo(Todo todo) async {
+    try {
+      final model = TodoModel.fromEntity(todo, isSynced: false);
+
+      await local.insertTodo(model);
+
+      if (await network.isConnected) {
+        try {
+          await remote.addTodo(model);
+        } catch (_) {
+        }
+      }
+
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Failed to add todo locally'));
+    }
+  }
 }
