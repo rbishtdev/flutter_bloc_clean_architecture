@@ -22,15 +22,18 @@ class TodoRepositoryImpl implements TodoRepository {
       final localTodos = await local.getTodos();
 
       if (await network.isConnected) {
-        final remoteTodos = await remote.getTodos();
-        for (final t in remoteTodos) {
-          await local.insertTodo(t.copyWith(isSynced: true));
+        try {
+          final remoteTodos = await remote.getTodos();
+          for (final todo in remoteTodos) {
+            await local.insertTodo(todo.copyWith(isSynced: true));
+          }
+        } catch (_) {
         }
       }
-
       return Right(localTodos.map((e) => e.toEntity()).toList());
     } catch (e) {
-      return Left(e as Failure);
+      return Left(CacheFailure('Local cache error'));
     }
   }
+
 }
