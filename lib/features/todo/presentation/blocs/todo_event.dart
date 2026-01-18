@@ -22,3 +22,8 @@ class DeleteTodoEvent extends TodoEvent {
   final int id;
   const DeleteTodoEvent(this.id);
 }
+
+class SyncTodosEvent extends TodoEvent {
+  const SyncTodosEvent();
+}
+

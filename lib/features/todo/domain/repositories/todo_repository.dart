@@ -7,4 +7,5 @@ abstract class TodoRepository {
   Future<Either<Failure, void>> addTodo(Todo todo);
   Future<Either<Failure, void>> deleteTodo(int id);
   Future<Either<Failure, void>> updateTodo(Todo todo);
+  Future<Either<Failure, void>> syncPendingTodos();
 }

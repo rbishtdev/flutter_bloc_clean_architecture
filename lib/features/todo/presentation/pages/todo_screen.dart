@@ -37,6 +37,7 @@ class TodoScreen extends StatelessWidget {
 
             return RefreshIndicator(
               onRefresh: () async {
+                context.read<TodoBloc>().add(const SyncTodosEvent());
                 context.read<TodoBloc>().add(const LoadTodos());
               },
               child: ListView.builder(

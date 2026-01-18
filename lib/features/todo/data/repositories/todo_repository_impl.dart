@@ -40,7 +40,7 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<Either<Failure, void>> addTodo(Todo todo) async {
     try {
-      final model = TodoModel.fromEntity(todo, isSynced: false);
+      final model = TodoModel.fromEntity(todo);
 
       await local.insertTodo(model);
 
@@ -97,5 +97,40 @@ class TodoRepositoryImpl implements TodoRepository {
       return Left(CacheFailure('Failed to update todo'));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> syncPendingTodos() async {
+    if (!await network.isConnected) {
+      return const Right(null);
+    }
+
+    try {
+      final pending = await local.getPendingTodos();
+
+      for (final todo in pending) {
+        try {
+          await remote.addTodo(todo);
+          await local.markSynced(todo.id);
+        } catch (_) {
+
+        }
+      }
+
+      final deleted = await local.getDeletedTodos();
+
+      for (final todo in deleted) {
+        try {
+          await remote.deleteTodo(todo.id);
+          await local.deleteTodo(todo.id);
+        } catch (_) {
+        }
+      }
+
+      return const Right(null);
+    } catch (_) {
+      return const Right(null); // never break UI for sync
+    }
+  }
+
 
 }
