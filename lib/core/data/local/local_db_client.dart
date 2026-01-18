@@ -20,7 +20,7 @@ class LocalDbClient {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getAll(String table) async {
+  Future<List<Map<String, dynamic>>> getAll(String table, String where) async {
     try {
       final db = await _client.database;
       return await db.query(table);
