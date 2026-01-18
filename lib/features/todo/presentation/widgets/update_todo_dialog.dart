@@ -7,8 +7,8 @@ import '../blocs/todo_event.dart';
 
 class UpdateTodoDialog extends StatelessWidget {
   final Todo todo;
-
-  const UpdateTodoDialog({super.key, required this.todo});
+  final BuildContext parentContext;
+  const UpdateTodoDialog({super.key, required this.todo, required this.parentContext});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,12 @@ class UpdateTodoDialog extends StatelessWidget {
             final updatedTitle = controller.text.trim();
             if (updatedTitle.isEmpty) return;
 
-            context.read<TodoBloc>().add(
+            if( todo.title == updatedTitle) {
+              Navigator.pop(context);
+              return;
+            }
+
+            parentContext.read<TodoBloc>().add(
               UpdateTodoEvent(
                 todo.copyWith(title: updatedTitle),
               ),

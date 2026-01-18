@@ -6,7 +6,8 @@ import '../blocs/todo_bloc.dart';
 import '../blocs/todo_event.dart';
 
 class AddTodoDialog extends StatelessWidget {
-  const AddTodoDialog({super.key});
+  final BuildContext parentContext;
+  const AddTodoDialog({super.key, required this.parentContext});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,7 @@ class AddTodoDialog extends StatelessWidget {
               completed: false,
             );
 
-            context.read<TodoBloc>().add(AddTodoEvent(todo));
+            parentContext.read<TodoBloc>().add(AddTodoEvent(todo));
             Navigator.pop(context);
           },
           child: const Text('Add'),

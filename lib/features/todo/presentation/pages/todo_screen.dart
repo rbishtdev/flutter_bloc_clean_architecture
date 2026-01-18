@@ -19,7 +19,7 @@ class TodoScreen extends StatelessWidget {
         onPressed: () {
           showDialog(
             context: context,
-            builder: (_) => AddTodoDialog(),
+            builder: (_) => AddTodoDialog(parentContext: context),
           );
         },
         child: const Icon(Icons.add),
@@ -48,23 +48,43 @@ class TodoScreen extends StatelessWidget {
                     key: ValueKey(todo.id),
                     children: [
                       ListTile(
-                        title: Text(todo.title),
+                        title: Text(todo.title,
+                          style: TextStyle(
+                            decoration:
+                            todo.completed
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                            color: todo.completed
+                          ? Colors.green : Colors.black
+                          ),
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            IconButton(
+                              icon: const Icon(Icons.check),
+                              onPressed: () {
+                                context.read<TodoBloc>().add(
+                                  UpdateTodoEvent(
+                                    todo.copyWith(completed: true),
+                                  ),
+                                );
+                              }
+                            ),
                             IconButton(
                               icon: const Icon(Icons.edit),
                               onPressed: () {
                                 showDialog(
                                   context: context,
-                                  builder: (_) => UpdateTodoDialog(todo: todo),
+                                  builder: (_) => UpdateTodoDialog(todo: todo, parentContext: context),
                                 );
                               },
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete),
+                              icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
-                                context.read<TodoBloc>().add(DeleteTodoEvent(todo.id));
+                                context.read<TodoBloc>().add(
+                                    DeleteTodoEvent(todo.id));
                               },
                             ),
                           ],
