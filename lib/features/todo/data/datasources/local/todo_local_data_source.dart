@@ -8,6 +8,7 @@ abstract class TodoLocalDataSource {
   Future<void> insertTodo(TodoModel todo);
   Future<void> deleteTodo(int id);
   Future<void> updateTodo(TodoModel todo);
+  Future<void> markSynced(int id);
 }
 
 @LazySingleton(as: TodoLocalDataSource)
@@ -48,6 +49,12 @@ class TodoLocalDataSourceImpl implements TodoLocalDataSource {
       'id = ?',
       [id],
     );
+  }
+
+  @override
+  Future<void> markSynced(int id) async {
+    await db.update('todos', {'is_synced': 1},
+        'id = ?', [id]);
   }
 }
 

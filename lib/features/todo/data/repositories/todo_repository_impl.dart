@@ -47,6 +47,7 @@ class TodoRepositoryImpl implements TodoRepository {
       if (await network.isConnected) {
         try {
           await remote.addTodo(model);
+          await local.markSynced(model.id);
         } catch (_) {
         }
       }
@@ -86,6 +87,7 @@ class TodoRepositoryImpl implements TodoRepository {
       if (await network.isConnected) {
         try {
           await remote.updateTodo(model);
+          await local.markSynced(model.id);
         } catch (_) {
         }
       }
