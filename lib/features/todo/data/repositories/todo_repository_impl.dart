@@ -1,0 +1,36 @@
+import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
+
+import '../../../../core/error/failure.dart';
+import '../../../../core/network/network_info.dart';
+import '../../domain/entities/todo.dart';
+import '../../domain/repositories/todo_repository.dart';
+import '../datasources/local/todo_local_data_source.dart';
+import '../datasources/remote/todo_remote_datasource.dart';
+
+@LazySingleton(as: TodoRepository)
+class TodoRepositoryImpl implements TodoRepository {
+  final TodoLocalDataSource local;
+  final TodoRemoteDataSource remote;
+  final NetworkInfo network;
+
+  TodoRepositoryImpl(this.local, this.remote, this.network);
+
+  @override
+  Future<Either<Failure, List<Todo>>> getTodos() async {
+    try {
+      final localTodos = await local.getTodos();
+
+      if (await network.isConnected) {
+        final remoteTodos = await remote.getTodos();
+        for (final t in remoteTodos) {
+          await local.insertTodo(t.copyWith(isSynced: true));
+        }
+      }
+
+      return Right(localTodos.map((e) => e.toEntity()).toList());
+    } catch (e) {
+      return Left(e as Failure);
+    }
+  }
+}
