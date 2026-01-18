@@ -1,3 +1,5 @@
+import 'package:injectable/injectable.dart';
+
 import '../../../../../core/data/remote/api_client.dart';
 import '../../models/todo_model.dart';
 
@@ -6,6 +8,7 @@ abstract class TodoRemoteDataSource {
   Future<void> addTodo(TodoModel todo);
 }
 
+@LazySingleton(as: TodoRemoteDataSource)
 class TodoRemoteDataSourceImpl implements TodoRemoteDataSource {
   final ApiClient api;
   TodoRemoteDataSourceImpl(this.api);

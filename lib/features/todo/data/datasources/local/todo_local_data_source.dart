@@ -1,5 +1,5 @@
+import 'package:injectable/injectable.dart';
 import 'package:proj/core/data/local/local_db_client.dart';
-import 'package:proj/core/data/local/sqlite_provider.dart';
 
 import '../../models/todo_model.dart';
 
@@ -8,6 +8,7 @@ abstract class TodoLocalDataSource {
   Future<void> insertTodo(TodoModel todo);
 }
 
+@LazySingleton(as: TodoLocalDataSource)
 class TodoLocalDataSourceImpl implements TodoLocalDataSource {
   final LocalDbClient db;
 
@@ -20,8 +21,8 @@ class TodoLocalDataSourceImpl implements TodoLocalDataSource {
   }
 
   @override
-  Future<void> insertTodo(TodoModel todo) {
-    throw UnimplementedError();
+  Future<void> insertTodo(TodoModel todo) async {
+    await db.insert('todos', todo.toJson());
   }
 }
 

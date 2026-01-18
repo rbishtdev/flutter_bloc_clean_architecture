@@ -13,11 +13,31 @@ class SqliteClient {
 
     _db = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
-        await db.execute(
-          'CREATE TABLE todos(id INTEGER PRIMARY KEY, title TEXT, completed INTEGER)',
-        );
+        await db.execute('''
+      CREATE TABLE todos(
+        id INTEGER PRIMARY KEY,
+        userId INTEGER,
+        title TEXT,
+        completed INTEGER,
+        is_synced INTEGER,
+        is_deleted INTEGER
+      )
+    ''');
+      },
+      onUpgrade: (db, oldV, newV) async {
+        await db.execute('DROP TABLE IF EXISTS todos');
+        await db.execute('''
+      CREATE TABLE todos(
+        id INTEGER PRIMARY KEY,
+        userId INTEGER,
+        title TEXT,
+        completed INTEGER,
+        is_synced INTEGER,
+        is_deleted INTEGER
+      )
+    ''');
       },
     );
 
