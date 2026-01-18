@@ -6,6 +6,8 @@ import '../../models/todo_model.dart';
 abstract class TodoLocalDataSource {
   Future<List<TodoModel>> getTodos();
   Future<void> insertTodo(TodoModel todo);
+  Future<void> deleteTodo(int id);
+  Future<void> updateTodo(TodoModel todo);
 }
 
 @LazySingleton(as: TodoLocalDataSource)
@@ -23,6 +25,29 @@ class TodoLocalDataSourceImpl implements TodoLocalDataSource {
   @override
   Future<void> insertTodo(TodoModel todo) async {
     await db.insert('todos', todo.toJson());
+  }
+
+  @override
+  Future<void> updateTodo(TodoModel todo) async {
+    await db.update(
+      'todos',
+      todo.toJson(),
+      'id = ?',
+      [todo.id],
+    );
+  }
+
+  @override
+  Future<void> deleteTodo(int id) async {
+    await db.update(
+      'todos',
+      {
+        'is_deleted': 1,
+        'is_synced': 0,
+      },
+      'id = ?',
+      [id],
+    );
   }
 }
 

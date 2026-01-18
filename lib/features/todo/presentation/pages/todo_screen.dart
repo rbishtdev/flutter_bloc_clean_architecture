@@ -45,9 +45,9 @@ class TodoScreen extends StatelessWidget {
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () {
-                        // context
-                        //     .read<TodoBloc>()
-                        //     .add(DeleteTodoEvent(todo.id));
+                        context
+                            .read<TodoBloc>()
+                            .add(DeleteTodoEvent(todo.id));
                       },
                     ),
                   );

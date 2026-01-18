@@ -56,4 +56,44 @@ class TodoRepositoryImpl implements TodoRepository {
       return Left(CacheFailure('Failed to add todo locally'));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> deleteTodo(int id) async {
+    try {
+      await local.deleteTodo(id);
+
+      if (await network.isConnected) {
+        try {
+          await remote.deleteTodo(id);
+        } catch (_) {
+        }
+      }
+
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Failed to delete todo'));
+    }
+  }
+
+
+  @override
+  Future<Either<Failure, void>> updateTodo(Todo todo) async {
+    try {
+      final model = TodoModel.fromEntity(todo, isSynced: false);
+
+      await local.updateTodo(model);
+
+      if (await network.isConnected) {
+        try {
+          await remote.updateTodo(model);
+        } catch (_) {
+        }
+      }
+
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Failed to update todo'));
+    }
+  }
+
 }
