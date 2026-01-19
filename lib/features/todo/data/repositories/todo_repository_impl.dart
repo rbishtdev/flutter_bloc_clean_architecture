@@ -20,7 +20,7 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<Either<Failure, List<Todo>>> getTodos() async {
     try {
-      final localTodos = await local.getTodos();
+      var localTodos = await local.getTodos();
 
       if (await network.isConnected) {
         try {
@@ -28,6 +28,8 @@ class TodoRepositoryImpl implements TodoRepository {
           for (final todo in remoteTodos) {
             await local.insertTodo(todo.copyWith(isSynced: true));
           }
+
+          localTodos = await local.getTodos();
         } catch (_) {
         }
       }

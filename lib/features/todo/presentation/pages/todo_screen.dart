@@ -26,7 +26,7 @@ class TodoScreen extends StatelessWidget {
       ),
       body: BlocBuilder<TodoBloc, TodoState>(
         builder: (context, state) {
-          if (state is TodoLoading) {
+          if (state is TodoInitial || state is TodoLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
