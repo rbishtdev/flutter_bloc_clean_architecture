@@ -43,7 +43,7 @@ class AddTodoDialog extends StatelessWidget {
             parentContext.read<TodoBloc>().add(AddTodoEvent(todo));
             Navigator.pop(context);
           },
-          child: const Text(AppStringConstants.cancelText),
+          child: const Text(AppStringConstants.addText),
         ),
       ],
     );

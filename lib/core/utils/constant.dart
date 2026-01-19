@@ -16,5 +16,5 @@ class AppStringConstants {
 
   static const updateToDoText = "Update Todo";
   static const enterUpdateTodoText = "Update todo title";
-  static const updateText = "Add";
+  static const updateText = "Update";
 }
