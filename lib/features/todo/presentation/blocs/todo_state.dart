@@ -21,3 +21,8 @@ class TodoError extends TodoState {
   final String message;
   const TodoError(this.message);
 }
+
+class TodoSuccess extends TodoState {
+  final String message;
+  const TodoSuccess(this.message);
+}

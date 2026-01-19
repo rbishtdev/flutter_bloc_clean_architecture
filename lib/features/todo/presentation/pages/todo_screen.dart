@@ -24,89 +24,114 @@ class TodoScreen extends StatelessWidget {
         },
         child: const Icon(Icons.add),
       ),
-      body: BlocBuilder<TodoBloc, TodoState>(
-        builder: (context, state) {
-          if (state is TodoInitial || state is TodoLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state is TodoLoaded) {
-            if (state.todos.isEmpty) {
-              return const Center(child: Text('No todos yet'));
-            }
-
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<TodoBloc>().add(const SyncTodosEvent());
-                context.read<TodoBloc>().add(const LoadTodos());
-              },
-              child: ListView.builder(
-                itemCount: state.todos.length,
-                itemBuilder: (context, index) {
-                  final todo = state.todos[index];
-
-                  return Column(
-                    key: ValueKey(todo.id),
-                    children: [
-                      ListTile(
-                        title: Text(todo.title,
-                          style: TextStyle(
-                            decoration:
-                            todo.completed
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
-                            color: todo.completed
-                          ? Colors.green : Colors.black
-                          ),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.check),
-                              onPressed: () {
-                                context.read<TodoBloc>().add(
-                                  UpdateTodoEvent(
-                                    todo.copyWith(completed: true),
-                                  ),
-                                );
-                              }
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => UpdateTodoDialog(todo: todo, parentContext: context),
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                context.read<TodoBloc>().add(
-                                    DeleteTodoEvent(todo.id));
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      if (index != state.todos.length - 1)
-                        const Divider(height: 1),
-                    ],
-                  );
-                },
-              )
+      body: BlocListener<TodoBloc, TodoState>(
+        listener: (context, state) {
+          if (state is TodoSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor:
+                Colors.green,
+                behavior: SnackBarBehavior.floating,
+              ),
             );
           }
 
           if (state is TodoError) {
-            return Center(child: Text(state.message));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor:
+                Colors.green,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
           }
-
-          return const SizedBox.shrink();
         },
+        child: BlocBuilder<TodoBloc, TodoState>(
+          builder: (context, state) {
+            if (state is TodoInitial || state is TodoLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state is TodoLoaded) {
+              if (state.todos.isEmpty) {
+                return const Center(child: Text('No todos yet'));
+              }
+
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context.read<TodoBloc>().add(const SyncTodosEvent());
+                  context.read<TodoBloc>().add(const LoadTodos());
+                },
+                child: ListView.builder(
+                  itemCount: state.todos.length,
+                  itemBuilder: (context, index) {
+                    final todo = state.todos[index];
+
+                    return Column(
+                      key: ValueKey(todo.id),
+                      children: [
+                        ListTile(
+                          title: Text(todo.title,
+                            style: TextStyle(
+                              decoration:
+                              todo.completed
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none,
+                              color: todo.completed
+                            ? Colors.green : Colors.black
+                            ),
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.check),
+                                onPressed: () {
+                                  context.read<TodoBloc>().add(
+                                    UpdateTodoEvent(
+                                      todo.copyWith(completed: true),
+                                    ),
+                                  );
+                                }
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => UpdateTodoDialog(todo: todo, parentContext: context),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  context.read<TodoBloc>().add(
+                                      DeleteTodoEvent(todo.id));
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        if (index != state.todos.length - 1)
+                          const Divider(height: 1),
+                      ],
+                    );
+                  },
+                )
+              );
+            }
+
+            if (state is TodoError) {
+              return Center(child: Text(state.message));
+            }
+
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

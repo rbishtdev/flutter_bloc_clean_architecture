@@ -57,6 +57,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
     final updatedTodos = [event.todo, ...currentState.todos];
 
+    emit(TodoSuccess('Todo created Successfully'));
     emit(TodoLoaded(updatedTodos));
 
     final result = await addTodos(event.todo);
@@ -73,6 +74,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       return todo.id == event.todo.id ? event.todo : todo;
     }).toList();
 
+    emit(TodoSuccess('Todo updated Successfully'));
     emit(TodoLoaded(updatedTodos));
 
     final result = await updateTodos(event.todo);
@@ -92,6 +94,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     final updatedTodos =
     currentState.todos.where((t) => t.id != event.id).toList();
 
+    emit(TodoSuccess('Todo deleted Successfully'));
     emit(TodoLoaded(updatedTodos));
 
     final result = await deleteTodos(event.id);
