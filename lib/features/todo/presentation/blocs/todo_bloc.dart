@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:proj/core/utils/constant.dart';
 import '../../domain/usecases/add_todos.dart';
 import '../../domain/usecases/delete_todos.dart';
 import '../../domain/usecases/sync_pending_todos.dart';
@@ -17,6 +20,8 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   final UpdateTodos updateTodos;
   final SyncPendingTodos syncPendingTodos;
   final Connectivity connectivity;
+  late final StreamSubscription<List<ConnectivityResult>>
+  _connectivitySubscription;
 
   TodoBloc({
     required this.getTodos,
@@ -32,7 +37,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     on<DeleteTodoEvent>(_onDeleteTodo);
     on<SyncTodosEvent>(_onSyncTodo);
 
-    connectivity.onConnectivityChanged.listen((results) {
+    _connectivitySubscription = connectivity.onConnectivityChanged.listen((results) {
       if (!results.contains(ConnectivityResult.none)) {
         add(const SyncTodosEvent());
       }
@@ -57,7 +62,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
     final updatedTodos = [event.todo, ...currentState.todos];
 
-    emit(TodoSuccess('Todo created Successfully'));
+    emit(TodoSuccess(AppStringConstants.toDoCreateSuccessMessage));
     emit(TodoLoaded(updatedTodos));
 
     final result = await addTodos(event.todo);
@@ -74,7 +79,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       return todo.id == event.todo.id ? event.todo : todo;
     }).toList();
 
-    emit(TodoSuccess('Todo updated Successfully'));
+    emit(TodoSuccess(AppStringConstants.toDoUpdateSuccessMessage));
     emit(TodoLoaded(updatedTodos));
 
     final result = await updateTodos(event.todo);
@@ -94,7 +99,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     final updatedTodos =
     currentState.todos.where((t) => t.id != event.id).toList();
 
-    emit(TodoSuccess('Todo deleted Successfully'));
+    emit(TodoSuccess(AppStringConstants.toDoDeleteSuccessMessage));
     emit(TodoLoaded(updatedTodos));
 
     final result = await deleteTodos(event.id);
@@ -110,5 +115,11 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       Emitter<TodoState> emit,
       ) async {
     await syncPendingTodos();
+  }
+
+  @override
+  Future<void> close() {
+    _connectivitySubscription.cancel();
+    return super.close();
   }
 }
