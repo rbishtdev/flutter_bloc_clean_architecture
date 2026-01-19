@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:proj/core/utils/constant.dart';
 
 import '../../domain/entities/todo.dart';
 import '../blocs/todo_bloc.dart';
@@ -15,18 +16,18 @@ class UpdateTodoDialog extends StatelessWidget {
     final controller = TextEditingController(text: todo.title);
 
     return AlertDialog(
-      title: const Text('Update Todo'),
+      title: const Text(AppStringConstants.updateText),
       content: TextField(
         controller: controller,
         autofocus: true,
         decoration: const InputDecoration(
-          hintText: 'Update todo title',
+          hintText: AppStringConstants.updateToDoText,
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text(AppStringConstants.cancelText),
         ),
         ElevatedButton(
           onPressed: () {
@@ -46,7 +47,7 @@ class UpdateTodoDialog extends StatelessWidget {
 
             Navigator.pop(context);
           },
-          child: const Text('Update'),
+          child: const Text(AppStringConstants.updateText),
         ),
       ],
     );
