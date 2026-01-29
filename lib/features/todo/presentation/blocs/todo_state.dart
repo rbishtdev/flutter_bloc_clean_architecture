@@ -1,6 +1,6 @@
 import '../../domain/entities/todo.dart';
 
-abstract class TodoState {
+sealed class TodoState {
   const TodoState();
 }
 
