@@ -4,13 +4,14 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:proj/core/utils/constant.dart';
+
 import '../../domain/usecases/add_todos.dart';
 import '../../domain/usecases/delete_todos.dart';
+import '../../domain/usecases/get_todos.dart';
 import '../../domain/usecases/sync_pending_todos.dart';
 import '../../domain/usecases/update_todos.dart';
 import 'todo_event.dart';
 import 'todo_state.dart';
-import '../../domain/usecases/get_todos.dart';
 
 @injectable
 class TodoBloc extends Bloc<TodoEvent, TodoState> {
